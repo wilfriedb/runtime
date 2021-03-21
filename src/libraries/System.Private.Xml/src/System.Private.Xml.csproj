@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>System.Xml</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -786,5 +786,8 @@
   <ItemGroup Condition="'$(TargetsAnyOS)'=='true'">
     <Compile Include="System\Xml\Xsl\Runtime\XmlCollation.Unix.cs" />
     <Compile Include="System\Xml\Core\XmlTextReaderImpl.Unix.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.CodeDom" Version="6.0.0-preview.1.21071.15" />
   </ItemGroup>
 </Project>

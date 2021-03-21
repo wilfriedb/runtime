@@ -66,6 +66,8 @@ namespace System.Xml.Serialization
 #endif
         }
 
+        internal static void ValidateIdentifiers(System.CodeDom.CodeObject e) { System.CodeDom.Compiler.CodeGenerator.ValidateIdentifiers(e); }
+
         internal void BeginMethod(Type returnType, string methodName, Type[] argTypes, string[] argNames, MethodAttributes methodAttributes)
         {
             _methodBuilder = _typeBuilder.DefineMethod(methodName, methodAttributes, returnType, argTypes);

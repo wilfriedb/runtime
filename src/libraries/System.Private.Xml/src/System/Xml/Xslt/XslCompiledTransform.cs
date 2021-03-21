@@ -47,7 +47,7 @@ namespace System.Xml.Xsl
         private readonly bool _enableDebug;
 
         // Results of compilation
-        private CompilerErrorCollection? _compilerErrorColl;
+        private Xslt.CompilerErrorCollection? _compilerErrorColl;
         private XmlWriterSettings? _outputSettings;
         private QilExpression? _qil;
 
@@ -139,7 +139,7 @@ namespace System.Xml.Xsl
             LoadInternal(stylesheetUri, settings, stylesheetResolver);
         }
 
-        private CompilerErrorCollection LoadInternal(object stylesheet, XsltSettings? settings, XmlResolver? stylesheetResolver)
+        private Xslt.CompilerErrorCollection LoadInternal(object stylesheet, XsltSettings? settings, XmlResolver? stylesheetResolver)
         {
             if (stylesheet == null)
             {
@@ -150,7 +150,7 @@ namespace System.Xml.Xsl
                 settings = XsltSettings.Default;
             }
             CompileXsltToQil(stylesheet, settings, stylesheetResolver);
-            CompilerError? error = GetFirstError();
+            Xslt.CompilerError? error = GetFirstError();
             if (error != null)
             {
                 throw new XslLoadException(error);
@@ -172,9 +172,9 @@ namespace System.Xml.Xsl
         /// <summary>
         /// Returns the first compiler error except warnings
         /// </summary>
-        private CompilerError? GetFirstError()
+        private Xslt.CompilerError? GetFirstError()
         {
-            foreach (CompilerError error in _compilerErrorColl!)
+            foreach (Xslt.CompilerError error in _compilerErrorColl!)
             {
                 if (!error.IsWarning)
                 {

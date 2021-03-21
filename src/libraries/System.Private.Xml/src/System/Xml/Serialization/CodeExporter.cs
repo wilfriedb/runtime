@@ -1,12 +1,8 @@
-//------------------------------------------------------------------------------
-// <copyright file="CodeExporter.cs" company="Microsoft">
-//     Copyright (c) Microsoft Corporation.  All rights reserved.
-// </copyright>
-// <owner current="true" primary="true">Microsoft</owner>                                                                
-//------------------------------------------------------------------------------
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
 
-namespace System.Xml.Serialization {
-    
+namespace System.Xml.Serialization
+{
     using System;
     using System.Collections;
     using System.IO;
@@ -19,29 +15,30 @@ namespace System.Xml.Serialization {
     using System.Diagnostics;
     using System.Security.Permissions;
 
-    /// <include file='doc\CodeExporter.uex' path='docs/doc[@for="CodeExporter"]/*' />
     ///<internalonly/>
     /// <devdoc>
     ///    <para>[To be supplied.]</para>
     /// </devdoc>
-    [PermissionSet(SecurityAction.InheritanceDemand, Name="FullTrust")]
-    public abstract class CodeExporter {
-        Hashtable exportedMappings;
-        Hashtable exportedClasses; // TypeMapping -> CodeTypeDeclaration
-        CodeNamespace codeNamespace;
-        CodeCompileUnit codeCompileUnit;
-        bool rootExported;
-        TypeScope scope;
-        CodeAttributeDeclarationCollection includeMetadata = new CodeAttributeDeclarationCollection();
-        CodeGenerationOptions options;
-        CodeDomProvider codeProvider;
-        CodeAttributeDeclaration generatedCodeAttribute;
+    public abstract class CodeExporter
+    {
+        protected Hashtable exportedMappings;
+        protected Hashtable? exportedClasses; // TypeMapping -> CodeTypeDeclaration
+        protected CodeNamespace? codeNamespace;
+        protected CodeCompileUnit? codeCompileUnit;
+        protected bool rootExported;
+        private TypeScope? scope;
+        private CodeAttributeDeclarationCollection includeMetadata = new CodeAttributeDeclarationCollection();
+        protected CodeGenerationOptions options;
+        protected CodeDomProvider codeProvider;
+        protected CodeAttributeDeclaration? generatedCodeAttribute;
 
-        internal CodeExporter(CodeNamespace codeNamespace, CodeCompileUnit codeCompileUnit, CodeDomProvider codeProvider, CodeGenerationOptions options, Hashtable exportedMappings) {
+        internal CodeExporter(CodeNamespace codeNamespace, CodeCompileUnit codeCompileUnit, CodeDomProvider codeProvider, CodeGenerationOptions options, Hashtable exportedMappings)
+        {
             if (codeNamespace != null)
                 CodeGenerator.ValidateIdentifiers(codeNamespace);
             this.codeNamespace = codeNamespace;
-            if (codeCompileUnit != null) {
+            if (codeCompileUnit != null)
+            {
                 if (!codeCompileUnit.ReferencedAssemblies.Contains("System.dll"))
                     codeCompileUnit.ReferencedAssemblies.Add("System.dll");
                 if (!codeCompileUnit.ReferencedAssemblies.Contains("System.Xml.dll"))
@@ -53,79 +50,100 @@ namespace System.Xml.Serialization {
             this.codeProvider = codeProvider;
         }
 
-        internal CodeCompileUnit CodeCompileUnit {
+        internal CodeCompileUnit? CodeCompileUnit
+        {
             get { return codeCompileUnit; }
         }
 
-        internal CodeNamespace CodeNamespace {
-            get {
+        internal CodeNamespace CodeNamespace
+        {
+            get
+            {
                 if (codeNamespace == null)
                     codeNamespace = new CodeNamespace();
                 return codeNamespace;
             }
         }
-        internal CodeDomProvider CodeProvider {
-            get {
-                if (codeProvider == null)
+        internal CodeDomProvider CodeProvider
+        {
+            get
+            {
+       //         if (codeProvider == null)
                     codeProvider = new Microsoft.CSharp.CSharpCodeProvider();
                 return codeProvider;
             }
         }
 
-        internal Hashtable ExportedClasses {
-            get { 
+        internal Hashtable ExportedClasses
+        {
+            get
+            {
                 if (exportedClasses == null)
                     exportedClasses = new Hashtable();
                 return exportedClasses;
             }
         }
 
-        internal Hashtable ExportedMappings {
-            get { 
+        internal Hashtable ExportedMappings
+        {
+            get
+            {
                 if (exportedMappings == null)
                     exportedMappings = new Hashtable();
                 return exportedMappings;
             }
         }
 
-        internal bool GenerateProperties {
+        internal bool GenerateProperties
+        {
             get { return (options & CodeGenerationOptions.GenerateProperties) != 0; }
         }
 
-        internal CodeAttributeDeclaration GeneratedCodeAttribute {
-            get {
-                if (generatedCodeAttribute == null) {
+        internal CodeAttributeDeclaration GeneratedCodeAttribute
+        {
+            get
+            {
+                if (generatedCodeAttribute == null)
+                {
                     CodeAttributeDeclaration decl = new CodeAttributeDeclaration(typeof(GeneratedCodeAttribute).FullName);
-                    Assembly a = Assembly.GetEntryAssembly();
-                    if (a == null) {
+                    var a = Assembly.GetEntryAssembly();
+                    if (a == null)
+                    {
                         a = Assembly.GetExecutingAssembly();
-                        if (a == null) {
+                        if (a == null)
+                        {
                             a = typeof(CodeExporter).Assembly;
                         }
                     }
                     AssemblyName assemblyName = a.GetName();
                     decl.Arguments.Add(new CodeAttributeArgument(new CodePrimitiveExpression(assemblyName.Name)));
-                    string version = GetProductVersion(a);
-                    decl.Arguments.Add(new CodeAttributeArgument(new CodePrimitiveExpression(version == null ? assemblyName.Version.ToString() : version)));
+                    string? version = GetProductVersion(a);
+                    decl.Arguments.Add(new CodeAttributeArgument(new CodePrimitiveExpression(version == null ? assemblyName.Version?.ToString() : version)));
                     generatedCodeAttribute = decl;
                 }
                 return generatedCodeAttribute;
             }
         }
 
-        internal static CodeAttributeDeclaration FindAttributeDeclaration(Type type, CodeAttributeDeclarationCollection metadata) {
-            foreach (CodeAttributeDeclaration attribute in metadata) {
-                if (attribute.Name == type.FullName || attribute.Name == type.Name) {
+        internal static CodeAttributeDeclaration? FindAttributeDeclaration(Type type, CodeAttributeDeclarationCollection metadata)
+        {
+            foreach (CodeAttributeDeclaration attribute in metadata)
+            {
+                if (attribute.Name == type.FullName || attribute.Name == type.Name)
+                {
                     return attribute;
                 }
             }
             return null;
         }
 
-        private static string GetProductVersion(Assembly assembly) {
+        private static string? GetProductVersion(Assembly assembly)
+        {
             object[] attributes = assembly.GetCustomAttributes(true);
-            for ( int i = 0; i<attributes.Length; i++ ) {
-                if (attributes[i] is AssemblyInformationalVersionAttribute) {
+            for (int i = 0; i < attributes.Length; i++)
+            {
+                if (attributes[i] is AssemblyInformationalVersionAttribute)
+                {
                     AssemblyInformationalVersionAttribute version = (AssemblyInformationalVersionAttribute)attributes[i];
                     return version.InformationalVersion;
                 }
@@ -133,97 +151,120 @@ namespace System.Xml.Serialization {
             return null;
         }
 
-        /// <include file='doc\XmlCodeExporter.uex' path='docs/doc[@for="XmlCodeExporter.IncludeMetadata"]/*' />
         /// <devdoc>
         ///    <para>[To be supplied.]</para>
         /// </devdoc>
-        public CodeAttributeDeclarationCollection IncludeMetadata {
+        public CodeAttributeDeclarationCollection IncludeMetadata
+        {
             get { return includeMetadata; }
         }
 
-        internal TypeScope Scope {
+        internal TypeScope? Scope
+        {
             get { return scope; }
         }
 
-        internal void CheckScope(TypeScope scope) {
-            if (this.scope == null) {
+        internal void CheckScope(TypeScope scope)
+        {
+            if (this.scope == null)
+            {
                 this.scope = scope;
             }
-            else if (this.scope != scope) {
-                throw new InvalidOperationException(Res.GetString(Res.XmlMappingsScopeMismatch));
+            else if (this.scope != scope)
+            {
+                throw new InvalidOperationException(SR.GetResourceString(SR.XmlMappingsScopeMismatch));
             }
         }
 
         internal abstract void ExportDerivedStructs(StructMapping mapping);
-        internal abstract void EnsureTypesExported(Accessor[] accessors, string ns);
+        internal abstract void EnsureTypesExported(Accessor[]? accessors, string? ns);
 
-        internal static void AddWarningComment(CodeCommentStatementCollection comments, string text) {
+        internal static void AddWarningComment(CodeCommentStatementCollection comments, string text)
+        {
             Debug.Assert(comments != null);
-            comments.Add(new CodeCommentStatement(Res.GetString(Res.XmlCodegenWarningDetails, text), false));
+            comments.Add(new CodeCommentStatement(SR.GetResourceString(SR.XmlCodegenWarningDetails, text), false));
         }
 
-        internal void ExportRoot(StructMapping mapping, Type includeType) {
-            if (!rootExported) {
+        internal void ExportRoot(StructMapping mapping, Type includeType)
+        {
+            if (!rootExported)
+            {
                 rootExported = true;
                 ExportDerivedStructs(mapping);
 
-                for (StructMapping derived = mapping.DerivedMappings; derived != null; derived = derived.NextDerivedMapping) {
-                    if (!derived.ReferencedByElement && derived.IncludeInSchema && !derived.IsAnonymousType) {
+                for (var derived = mapping.DerivedMappings; derived != null; derived = derived.NextDerivedMapping)
+                {
+                    if (!derived.ReferencedByElement && derived.IncludeInSchema && !derived.IsAnonymousType)
+                    {
                         CodeAttributeDeclaration include = new CodeAttributeDeclaration(includeType.FullName);
-                        include.Arguments.Add(new CodeAttributeArgument(new CodeTypeOfExpression(derived.TypeDesc.FullName)));
+                        include.Arguments.Add(new CodeAttributeArgument(new CodeTypeOfExpression(derived.TypeDesc?.FullName)));
                         includeMetadata.Add(include);
                     }
                 }
                 Hashtable typesIncluded = new Hashtable();
-                foreach (TypeMapping m in Scope.TypeMappings) {
-                    if (m is ArrayMapping) {
-                        ArrayMapping arrayMapping = (ArrayMapping) m;
-                        if (ShouldInclude(arrayMapping) && !typesIncluded.Contains(arrayMapping.TypeDesc.FullName)) {
-                            CodeAttributeDeclaration include = new CodeAttributeDeclaration(includeType.FullName);
-                            include.Arguments.Add(new CodeAttributeArgument(new CodeTypeOfExpression(arrayMapping.TypeDesc.FullName)));
-                            includeMetadata.Add(include);
-                            typesIncluded.Add(arrayMapping.TypeDesc.FullName, string.Empty);
-                            EnsureTypesExported(arrayMapping.Elements, arrayMapping.Namespace);
+                if (Scope is not null)
+                {
+                    foreach (TypeMapping m in Scope.TypeMappings)
+                    {
+                        if (m is ArrayMapping)
+                        {
+                            ArrayMapping arrayMapping = (ArrayMapping)m;
+                            if (ShouldInclude(arrayMapping) && arrayMapping.TypeDesc?.FullName is not null &&!typesIncluded.Contains(arrayMapping.TypeDesc.FullName))
+                            {
+                                CodeAttributeDeclaration include = new CodeAttributeDeclaration(includeType.FullName);
+                                include.Arguments.Add(new CodeAttributeArgument(new CodeTypeOfExpression(arrayMapping.TypeDesc.FullName)));
+                                includeMetadata.Add(include);
+                                typesIncluded.Add(arrayMapping.TypeDesc.FullName, string.Empty);
+                                EnsureTypesExported(arrayMapping.Elements, arrayMapping.Namespace);
+                            }
                         }
                     }
                 }
             }
         }
 
-        private static bool ShouldInclude(ArrayMapping arrayMapping) {
+        private static bool ShouldInclude(ArrayMapping arrayMapping)
+        {
             if (arrayMapping.ReferencedByElement)
                 return false;
             if (arrayMapping.Next != null)
                 return false;
-            if (arrayMapping.Elements.Length == 1) {
-                TypeKind kind = arrayMapping.Elements[0].Mapping.TypeDesc.Kind;
-                if (kind == TypeKind.Node)
+            if (arrayMapping.Elements?.Length == 1)
+            {
+                TypeKind? kind = arrayMapping.Elements[0].Mapping?.TypeDesc?.Kind;
+                if (kind is null || kind == TypeKind.Node)
                     return false;
             }
 
-            for (int i = 0; i < arrayMapping.Elements.Length; i++) {
-                if (arrayMapping.Elements[i].Name != arrayMapping.Elements[i].Mapping.DefaultElementName) {
-                    // in the case we need custom attributes to serialize an array instance, we cannot include arrau mapping without explicit reference.
+            for (int i = 0; i < arrayMapping.Elements?.Length; i++)
+            {
+                if (arrayMapping.Elements[i].Name != arrayMapping.Elements[i].Mapping?.DefaultElementName)
+                {
+                    // in the case we need custom attributes to serialize an array instance, we cannot include array mapping without explicit reference.
                     return false;
                 }
             }
             return true;
         }
 
-        internal CodeTypeDeclaration ExportEnum(EnumMapping mapping, Type type) {
-            CodeTypeDeclaration codeClass = new CodeTypeDeclaration(mapping.TypeDesc.Name);
+        internal CodeTypeDeclaration ExportEnum(EnumMapping mapping, Type type)
+        {
+            CodeTypeDeclaration codeClass = new CodeTypeDeclaration(mapping.TypeDesc?.Name);
 
-            codeClass.Comments.Add(new CodeCommentStatement(Res.GetString(Res.XmlRemarks), true));
+            codeClass.Comments.Add(new CodeCommentStatement(SR.GetResourceString(SR.XmlRemarks), true));
             codeClass.IsEnum = true;
-            if (mapping.IsFlags && mapping.Constants.Length > 31) {
+            if (mapping.IsFlags && mapping.Constants?.Length > 31)
+            {
                 codeClass.BaseTypes.Add(new CodeTypeReference(typeof(long)));
             }
             codeClass.TypeAttributes |= TypeAttributes.Public;
             CodeNamespace.Types.Add(codeClass);
-            for (int i = 0; i < mapping.Constants.Length; i++) {
+            for (int i = 0; i < mapping.Constants?.Length; i++)
+            {
                 ExportConstant(codeClass, mapping.Constants[i], type, mapping.IsFlags, 1L << i);
             }
-            if (mapping.IsFlags) {
+            if (mapping.IsFlags)
+            {
                 // Add [FlagsAttribute]
                 CodeAttributeDeclaration flags = new CodeAttributeDeclaration(typeof(FlagsAttribute).FullName);
                 codeClass.CustomAttributes.Add(flags);
@@ -232,70 +273,88 @@ namespace System.Xml.Serialization {
             return codeClass;
         }
 
-        internal void AddTypeMetadata(CodeAttributeDeclarationCollection metadata, Type type, string defaultName, string name, string ns, bool includeInSchema) {
+        internal void AddTypeMetadata(CodeAttributeDeclarationCollection metadata, Type type, string defaultName, string name, string ns, bool includeInSchema)
+        {
             CodeAttributeDeclaration attribute = new CodeAttributeDeclaration(type.FullName);
-            if (name == null || name.Length == 0) {
+            if (name == null || name.Length == 0)
+            {
                 attribute.Arguments.Add(new CodeAttributeArgument("AnonymousType", new CodePrimitiveExpression(true)));
             }
-            else {
-                if (defaultName != name) {
+            else
+            {
+                if (defaultName != name)
+                {
                     attribute.Arguments.Add(new CodeAttributeArgument("TypeName", new CodePrimitiveExpression(name)));
                 }
             }
-            if (ns != null && ns.Length != 0) {
+            if (ns != null && ns.Length != 0)
+            {
                 attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(ns)));
             }
-            if (!includeInSchema) {
+            if (!includeInSchema)
+            {
                 attribute.Arguments.Add(new CodeAttributeArgument("IncludeInSchema", new CodePrimitiveExpression(false)));
             }
-            if (attribute.Arguments.Count > 0) {
+            if (attribute.Arguments.Count > 0)
+            {
                 metadata.Add(attribute);
             }
         }
 
-        internal static void AddIncludeMetadata(CodeAttributeDeclarationCollection metadata, StructMapping mapping, Type type) {
+        internal static void AddIncludeMetadata(CodeAttributeDeclarationCollection metadata, StructMapping mapping, Type type)
+        {
             if (mapping.IsAnonymousType)
                 return;
-            for (StructMapping derived = mapping.DerivedMappings; derived != null; derived = derived.NextDerivedMapping) {
+            for (var derived = mapping.DerivedMappings; derived != null; derived = derived.NextDerivedMapping)
+            {
                 CodeAttributeDeclaration attribute = new CodeAttributeDeclaration(type.FullName);
-                attribute.Arguments.Add(new CodeAttributeArgument(new CodeTypeOfExpression(derived.TypeDesc.FullName)));
+                attribute.Arguments.Add(new CodeAttributeArgument(new CodeTypeOfExpression(derived.TypeDesc?.FullName)));
                 metadata.Add(attribute);
                 AddIncludeMetadata(metadata, derived, type);
             }
         }
 
-        internal static void ExportConstant(CodeTypeDeclaration codeClass, ConstantMapping constant,  Type type, bool init, long enumValue) {
+        internal static void ExportConstant(CodeTypeDeclaration codeClass, ConstantMapping constant, Type type, bool init, long enumValue)
+        {
             CodeMemberField field = new CodeMemberField(typeof(int).FullName, constant.Name);
-            field.Comments.Add(new CodeCommentStatement(Res.GetString(Res.XmlRemarks), true));
+            field.Comments.Add(new CodeCommentStatement(SR.GetResourceString(SR.XmlRemarks), true));
             if (init)
                 field.InitExpression = new CodePrimitiveExpression(enumValue);
             codeClass.Members.Add(field);
-            if (constant.XmlName != constant.Name) {
+            if (constant.XmlName != constant.Name)
+            {
                 CodeAttributeDeclaration attribute = new CodeAttributeDeclaration(type.FullName);
                 attribute.Arguments.Add(new CodeAttributeArgument(new CodePrimitiveExpression(constant.XmlName)));
                 field.CustomAttributes.Add(attribute);
             }
         }
 
-        internal static object PromoteType(Type type, object value) {
-            if (type == typeof(sbyte)) {
+        internal static object PromoteType(Type type, object value)
+        {
+            if (type == typeof(sbyte))
+            {
                 return ((IConvertible)value).ToInt16(null);
             }
-            else if (type == typeof(UInt16)) {
+            else if (type == typeof(ushort))
+            {
                 return ((IConvertible)value).ToInt32(null);
             }
-            else if (type == typeof(UInt32)) {
+            else if (type == typeof(uint))
+            {
                 return ((IConvertible)value).ToInt64(null);
             }
-            else if (type == typeof(UInt64)) {
+            else if (type == typeof(ulong))
+            {
                 return ((IConvertible)value).ToDecimal(null);
             }
-            else {
+            else
+            {
                 return value;
             }
         }
 
-        internal CodeMemberProperty CreatePropertyDeclaration(CodeMemberField field, string name, string typeName) {
+        internal CodeMemberProperty CreatePropertyDeclaration(CodeMemberField field, string name, string typeName)
+        {
             CodeMemberProperty prop = new CodeMemberProperty();
             prop.Type = new CodeTypeReference(typeName);
             prop.Name = name;
@@ -305,7 +364,7 @@ namespace System.Xml.Serialization {
             CodeMethodReturnStatement ret = new CodeMethodReturnStatement();
             ret.Expression = new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), field.Name);
             prop.GetStatements.Add(ret);
-   
+
             CodeAssignStatement propertySet = new CodeAssignStatement();
             CodeExpression left = new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), field.Name);
             CodeExpression right = new CodePropertySetValueReferenceExpression();
@@ -323,7 +382,8 @@ namespace System.Xml.Serialization {
             return prop;
         }
 
-        internal static string MakeFieldName(string name) {
+        internal static string MakeFieldName(string name)
+        {
             return CodeIdentifier.MakeCamel(name) + "Field";
         }
 
@@ -340,8 +400,9 @@ namespace System.Xml.Serialization {
                 codeClass.Members.Add(RaisePropertyChangedEventMethod);
             }
         }
-        
-        bool EnableDataBinding {
+
+        protected bool EnableDataBinding
+        {
             get { return (options & CodeGenerationOptions.EnableDataBinding) != 0; }
         }
 
