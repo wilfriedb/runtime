@@ -43,6 +43,7 @@
       <DependentUpon>TextUtf8RawTextWriter.tt</DependentUpon>
     </Compile>
     <Compile Include="System\Xml\Serialization\CodeExporter.cs" />
+    <Compile Include="System\Xml\Serialization\XmlCodeExporter.cs" />
     <None Include="System\Xml\Core\HtmlEncodedRawTextWriter.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>HtmlEncodedRawTextWriter.cs</LastGenOutput>
