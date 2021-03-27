@@ -12,6 +12,7 @@ namespace System.Xml.Serialization
     using System.Xml;
     using System.Xml.Extensions;
     using System.Xml.Schema;
+    using System.Xml.Serialization.Advanced;
 
     // These classes provide a higher level view on reflection specific to
     // Xml serialization, for example:
@@ -71,12 +72,10 @@ namespace System.Xml.Serialization
         private TypeDesc? _arrayTypeDesc;
         private TypeDesc? _nullableTypeDesc;
         private readonly TypeKind _kind;
-        private readonly XmlSchemaType? _dataType;
         private Type? _type;
         private TypeDesc? _baseTypeDesc;
         private TypeFlags _flags;
         private readonly string? _formatterName;
-        private readonly bool _isXsdType;
         private bool _isMixed;
         private int _weight;
         private Exception? _exception;
@@ -88,8 +87,8 @@ namespace System.Xml.Serialization
             _kind = kind;
             _baseTypeDesc = baseTypeDesc;
             _flags = flags;
-            _isXsdType = kind == TypeKind.Primitive;
-            if (_isXsdType)
+            IsXsdType = kind == TypeKind.Primitive;
+            if (IsXsdType)
                 _weight = 1;
             else if (kind == TypeKind.Enum)
                 _weight = 2;
@@ -97,7 +96,7 @@ namespace System.Xml.Serialization
                 _weight = -1;
             else
                 _weight = baseTypeDesc == null ? 0 : baseTypeDesc.Weight + 1;
-            _dataType = dataType;
+            DataType = dataType;
             _formatterName = formatterName;
         }
 
@@ -108,7 +107,7 @@ namespace System.Xml.Serialization
         internal TypeDesc(Type type, bool isXsdType, XmlSchemaType dataType, string formatterName, TypeFlags flags)
             : this(type!.Name, type.FullName!, dataType, TypeKind.Primitive, (TypeDesc?)null, flags, formatterName)
         {
-            _isXsdType = isXsdType;
+            IsXsdType = isXsdType;
             _type = type;
         }
         internal TypeDesc(Type? type, string name, string fullName, TypeKind kind, TypeDesc? baseTypeDesc, TypeFlags flags, TypeDesc? arrayElementTypeDesc)
@@ -128,15 +127,14 @@ namespace System.Xml.Serialization
             get { return _flags; }
         }
 
-        internal bool IsXsdType
-        {
-            get { return _isXsdType; }
-        }
+        internal bool IsXsdType { get; init; }
 
         internal bool IsMappedType
         {
-            get { return false; }
+            get { return ExtendedType != null; }
         }
+
+        internal MappedTypeDesc? ExtendedType { get; init; }
 
         internal string Name
         {
@@ -160,10 +158,7 @@ namespace System.Xml.Serialization
             }
         }
 
-        internal XmlSchemaType? DataType
-        {
-            get { return _dataType; }
-        }
+        internal XmlSchemaType? DataType { get; init; }
 
         internal Type? Type
         {
@@ -404,6 +399,18 @@ namespace System.Xml.Serialization
             if (_arrayTypeDesc == null)
                 _arrayTypeDesc = new TypeDesc(null, _name + "[]", _fullName + "[]", TypeKind.Array, null, TypeFlags.Reference | (_flags & TypeFlags.UseReflection), this);
             return _arrayTypeDesc;
+        }
+
+        internal TypeDesc CreateMappedTypeDesc(MappedTypeDesc extension)
+        {
+            TypeDesc newTypeDesc = new TypeDesc(extension.Name, extension.Name, null, this._kind, this._baseTypeDesc, this._flags, null)
+            {
+                IsXsdType = this.IsXsdType,
+                _isMixed = this._isMixed,
+                ExtendedType = extension,
+                DataType = this.DataType,
+            };
+            return newTypeDesc;
         }
 
         internal TypeDesc? BaseTypeDesc

@@ -3459,4 +3459,31 @@ Usage: dotnet {0} [--assembly &lt;assembly file path&gt;] [--type &lt;type name&
   <data name="XmlRemarks" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="XmlConfigurationDuplicateExtension" xml:space="preserve">
+    <value>TODP</value>
+  </data>
+  <data name="XmlDropArrayAttributeValue" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="XmlDropAttributeValue" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="XmlDropDefaultAttribute" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="XmlDropNonPrimitiveAttributeValue" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="XmlExtensionComment" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="XmlExtensionDuplicateDefinition" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="XmlInvalidSchemaExtension" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="XmlNotKnownDefaultValue" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>

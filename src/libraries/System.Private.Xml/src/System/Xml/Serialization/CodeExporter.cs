@@ -21,7 +21,7 @@ namespace System.Xml.Serialization
     /// </devdoc>
     public abstract class CodeExporter
     {
-        protected Hashtable exportedMappings;
+        protected Hashtable? exportedMappings;
         protected Hashtable? exportedClasses; // TypeMapping -> CodeTypeDeclaration
         protected CodeNamespace? codeNamespace;
         protected CodeCompileUnit? codeCompileUnit;
@@ -29,10 +29,10 @@ namespace System.Xml.Serialization
         private TypeScope? scope;
         private CodeAttributeDeclarationCollection includeMetadata = new CodeAttributeDeclarationCollection();
         protected CodeGenerationOptions options;
-        protected CodeDomProvider codeProvider;
+        protected CodeDomProvider? codeProvider;
         protected CodeAttributeDeclaration? generatedCodeAttribute;
 
-        internal CodeExporter(CodeNamespace codeNamespace, CodeCompileUnit codeCompileUnit, CodeDomProvider codeProvider, CodeGenerationOptions options, Hashtable exportedMappings)
+        internal CodeExporter(CodeNamespace codeNamespace, CodeCompileUnit? codeCompileUnit, CodeDomProvider? codeProvider, CodeGenerationOptions options, Hashtable? exportedMappings)
         {
             if (codeNamespace != null)
                 CodeGenerator.ValidateIdentifiers(codeNamespace);
@@ -68,7 +68,7 @@ namespace System.Xml.Serialization
         {
             get
             {
-       //         if (codeProvider == null)
+                if (codeProvider == null)
                     codeProvider = new Microsoft.CSharp.CSharpCodeProvider();
                 return codeProvider;
             }
@@ -164,7 +164,7 @@ namespace System.Xml.Serialization
             get { return scope; }
         }
 
-        internal void CheckScope(TypeScope scope)
+        internal void CheckScope(TypeScope? scope)
         {
             if (this.scope == null)
             {
@@ -273,7 +273,7 @@ namespace System.Xml.Serialization
             return codeClass;
         }
 
-        internal void AddTypeMetadata(CodeAttributeDeclarationCollection metadata, Type type, string defaultName, string name, string ns, bool includeInSchema)
+        internal void AddTypeMetadata(CodeAttributeDeclarationCollection metadata, Type type, string defaultName, string? name, string? ns, bool includeInSchema)
         {
             CodeAttributeDeclaration attribute = new CodeAttributeDeclaration(type.FullName);
             if (name == null || name.Length == 0)
@@ -353,7 +353,7 @@ namespace System.Xml.Serialization
             }
         }
 
-        internal CodeMemberProperty CreatePropertyDeclaration(CodeMemberField field, string name, string typeName)
+        internal CodeMemberProperty CreatePropertyDeclaration(CodeMemberField field, string name, string? typeName)
         {
             CodeMemberProperty prop = new CodeMemberProperty();
             prop.Type = new CodeTypeReference(typeName);

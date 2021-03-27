@@ -12,6 +12,7 @@ namespace System.Xml.Serialization
     using System.Xml;
     using System.Xml.Serialization;
     using System.Diagnostics.CodeAnalysis;
+    using System.CodeDom.Compiler;
 
     // These classes represent a mapping between classes and a particular XML format.
     // There are two class of mapping information: accessors (such as elements and
@@ -732,6 +733,38 @@ namespace System.Xml.Serialization
             get { return _attribute != null; }
         }
 
+        private static bool IsNeedNullableMember(ElementAccessor element)
+        {
+            if (element.Mapping is ArrayMapping)
+            {
+                ArrayMapping arrayMapping = (ArrayMapping)element.Mapping;
+                if (arrayMapping.Elements != null && arrayMapping.Elements.Length == 1)
+                {
+                    return IsNeedNullableMember(arrayMapping.Elements[0]);
+                }
+                return false;
+            }
+            else
+            {
+                return element.IsNullable && (element.Mapping?.TypeDesc?.IsValueType ?? false);
+            }
+        }
+
+        internal bool IsNeedNullable
+        {
+            get
+            {
+                if (_xmlns != null) return false;
+                if (_attribute != null) return false;
+                if (_elements != null && _elements.Length == 1)
+                {
+                    return IsNeedNullableMember(_elements[0]);
+                }
+                return false;
+            }
+        }
+
+
         internal bool IsText
         {
             get { return _text != null && (_elements == null || _elements.Length == 0); }
@@ -1001,6 +1034,27 @@ namespace System.Xml.Serialization
         internal MemberMapping Clone()
         {
             return new MemberMapping(this);
+        }
+
+        private string GetNullableType(TypeDesc td)
+        {
+            // SOAP encoded arrays not mapped to Nullable<T> since they always derive from soapenc:Array
+            if (td.IsMappedType || (!td.IsValueType && ((Elements is not null && Elements[0].IsSoap) || td.ArrayElementTypeDesc == null)))
+                return td.FullName;
+            if (td.ArrayElementTypeDesc != null)
+            {
+                return GetNullableType(td.ArrayElementTypeDesc) + "[]";
+            }
+            return "System.Nullable`1[" + td.FullName + "]";
+        }
+
+        internal string? GetTypeName(CodeDomProvider codeProvider)
+        {
+            if (TypeDesc is not null && IsNeedNullable && codeProvider.Supports(GeneratorSupport.GenericTypeReference))
+            {
+                return GetNullableType(TypeDesc);
+            }
+            return TypeDesc?.FullName;
         }
     }
 

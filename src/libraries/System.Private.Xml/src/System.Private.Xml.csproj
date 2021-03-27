@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>System.Xml</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -42,6 +42,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>TextUtf8RawTextWriter.tt</DependentUpon>
     </Compile>
+    <Compile Include="System\Xml\Serialization\Advanced\SchemaImporterExtension.cs" />
     <Compile Include="System\Xml\Serialization\CodeExporter.cs" />
     <Compile Include="System\Xml\Serialization\XmlCodeExporter.cs" />
     <None Include="System\Xml\Core\HtmlEncodedRawTextWriter.tt">
@@ -545,6 +546,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="System.ComponentModel.Primitives">
+      <HintPath>..\..\..\..\artifacts\bin\microsoft.netcore.app.ref\ref\net6.0\System.ComponentModel.Primitives.dll</HintPath>
+    </Reference>
     <Reference Include="System.Reflection.Emit" />
     <Reference Include="System.Reflection.Emit.ILGeneration" />
     <Reference Include="System.Reflection.Emit.Lightweight" />

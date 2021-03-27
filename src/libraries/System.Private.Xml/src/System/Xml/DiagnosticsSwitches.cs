@@ -35,5 +35,7 @@ namespace System.Xml
                 return s_nonRecursiveTypeLoading;
             }
         }
+
+        public static TraceSwitch XmlSerialization { get; } = new TraceSwitch("XmlSerialization.TraceVerbose", "Enable tracing for the System.Xml.Serialization component.");
     }
 }
