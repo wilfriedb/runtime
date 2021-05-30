@@ -432,7 +432,7 @@ namespace System.Xml.Serialization
                 {
                     DropDefaultAttribute(accessor, comments, memberTypeDesc?.FullName);
                     // do not generate intializers for the user prefered types if they do not have default capability
-                    AddWarningComment(comments, SR.GetResourceString(SR.XmlDropAttributeValue, $"{attributeName} {mapping?.TypeName} {defaultValue}")); // TODO: better default string
+                    AddWarningComment(comments, SR.Format(SR.GetResourceString(SR.XmlDropAttributeValue), attributeName, mapping?.TypeName, defaultValue));
                 }
                 return;
             }
@@ -442,7 +442,7 @@ namespace System.Xml.Serialization
                 {
                     DropDefaultAttribute(accessor, comments, memberTypeDesc.FullName);
                     // do not generate intializers for array-like types
-                    AddWarningComment(comments, SR.GetResourceString(SR.XmlDropArrayAttributeValue, $"{attributeName} {defaultValue} {((ElementAccessor)accessor).Name}")); // TODO: better default string
+                    AddWarningComment(comments, SR.Format(SR.GetResourceString(SR.XmlDropArrayAttributeValue), attributeName, defaultValue, ((ElementAccessor)accessor).Name));
                 }
                 return;
             }
@@ -467,7 +467,7 @@ namespace System.Xml.Serialization
                     DropDefaultAttribute(accessor, comments, mapping.TypeDesc.FullName);
                     if (init == null)
                     {
-                        AddWarningComment(comments, SR.GetResourceString(SR.XmlNotKnownDefaultValue, $"{extension?.GetType().FullName} {attributeName} {(string)defaultValue} {mapping.TypeName} {mapping.Namespace}"));
+                        AddWarningComment(comments, SR.Format(SR.GetResourceString(SR.XmlNotKnownDefaultValue), extension?.GetType().FullName, attributeName, (string)defaultValue, mapping.TypeName, mapping.Namespace));
                     }
                 }
                 return;
@@ -483,7 +483,7 @@ namespace System.Xml.Serialization
                 if (comments != null)
                 {
                     DropDefaultAttribute(accessor, comments, memberTypeDesc?.FullName);
-                    AddWarningComment(comments, SR.GetResourceString(SR.XmlDropNonPrimitiveAttributeValue, $"{attributeName} {defaultValue}")); // TODO: better default string
+                    AddWarningComment(comments, SR.Format(SR.GetResourceString(SR.XmlDropNonPrimitiveAttributeValue), attributeName, defaultValue));
                 }
                 return;
             }
@@ -499,7 +499,7 @@ namespace System.Xml.Serialization
             {
                 if (comments != null)
                 {
-                    AddWarningComment(comments, SR.GetResourceString(SR.XmlDropAttributeValue, $"{attributeName} {pm.TypeName} {defaultValue}")); // TODO: better default string
+                    AddWarningComment(comments, SR.Format(SR.GetResourceString(SR.XmlDropAttributeValue), attributeName, pm.TypeName, defaultValue));
                 }
                 return;
             }
@@ -562,7 +562,7 @@ namespace System.Xml.Serialization
         {
             if (!accessor.IsFixed && accessor.IsOptional)
             {
-                AddWarningComment(comments, SR.GetResourceString(SR.XmlDropDefaultAttribute, type));
+                AddWarningComment(comments, SR.Format(SR.GetResourceString(SR.XmlDropDefaultAttribute), type));
             }
         }
 

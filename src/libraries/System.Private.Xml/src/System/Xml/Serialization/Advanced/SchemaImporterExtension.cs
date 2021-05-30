@@ -73,7 +73,7 @@ namespace System.Xml.Serialization.Advanced
             }
             else
             {
-                throw new ArgumentException(SR.GetResourceString(SR.XmlInvalidSchemaExtension, type.ToString()));
+                throw new ArgumentException(SR.Format(SR.GetResourceString(SR.XmlInvalidSchemaExtension), type.ToString()));
             }
         }
 
@@ -115,7 +115,7 @@ namespace System.Xml.Serialization.Advanced
             {
                 if (Names[name]?.GetType() != extension?.GetType())
                 {
-                    throw new InvalidOperationException(SR.GetResourceString(SR.XmlConfigurationDuplicateExtension, name));
+                    throw new InvalidOperationException(SR.Format(SR.GetResourceString(SR.XmlConfigurationDuplicateExtension), name));
                 }
                 return -1;
             }
@@ -201,13 +201,13 @@ namespace System.Xml.Serialization.Advanced
                 codeNamespace.Imports.Add(import);
             }
             CodeTypeDeclaration? codeClass = null;
-            string comment = SR.GetResourceString(SR.XmlExtensionComment, extension.GetType().FullName);
+            string comment = SR.Format(SR.GetResourceString(SR.XmlExtensionComment), extension.GetType().FullName);
             foreach (CodeTypeDeclaration type in code.Types)
             {
                 if (clrType == type.Name)
                 {
                     if (codeClass != null)
-                        throw new InvalidOperationException(SR.GetResourceString(SR.XmlExtensionDuplicateDefinition, $"{extension.GetType().FullName} {clrType}"));
+                        throw new InvalidOperationException(SR.Format(SR.GetResourceString(SR.XmlExtensionDuplicateDefinition), extension.GetType().FullName, clrType));
                     codeClass = type;
                 }
                 type.Comments.Add(new CodeCommentStatement(comment, false));
