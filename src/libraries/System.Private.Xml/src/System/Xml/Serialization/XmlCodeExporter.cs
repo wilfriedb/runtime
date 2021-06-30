@@ -637,14 +637,13 @@ namespace System.Xml.Serialization
                     }
                 }
 
-                foreach (var member in mapping.Members)
-                //for (int i = 0; i < mapping.Members.Length; i++)
+                for (int i = 0; i < mapping.Members.Length; i++)
                 {
-                    if (member.Xmlns != null)
+                    if (mapping.Members[i].Xmlns != null)
                         continue;
-                    EnsureTypesExported(member.Elements, mapping.Namespace);
-                    EnsureTypesExported(member.Attribute, mapping.Namespace);
-                    EnsureTypesExported(member.Text, mapping.Namespace);
+                    EnsureTypesExported(mapping.Members[i].Elements, mapping.Namespace);
+                    EnsureTypesExported(mapping.Members[i].Attribute, mapping.Namespace);
+                    EnsureTypesExported(mapping.Members[i].Text, mapping.Namespace);
                 }
             }
 
